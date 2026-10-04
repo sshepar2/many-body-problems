@@ -7,21 +7,26 @@ from .sampler import thermalize, metropolis_step, estimate_energy_tensor
 from .hamiltonian import kinetic_energy, kinetic_energy_jvp, potential_energy, Vnn
 from .diagnostics import DensityAccumulator
 from .sr import sr_update
-from .plotting import plot_density
+#from .plotting import plot_density
 from .utils import print_section, print_epoch
 from .checkpoint import load_checkpoint, save_checkpoint, resolve_state_dict
 
 
-# MUST SORT OUT
-
 def run_vmc(
-    wf_cfg,
-    vmc_cfg,
-    atoms,
-    device,
-    optimizer=None,
-    scheduler=None,
+    wf_cfg: WaveFunctionConfig,
+    vmc_cfg: VmcConfig,
+    atoms: torch.Tensor,
+    device: torch.device,
 ):
+    """Runs a variational Monte Carlo optimization
+    
+    Args:
+
+        wf_cfg: Wave function configuration.
+        vmc_cfg: VMC sampling and optimization configuration.
+        atoms: Atomic positions defining the finite system.
+        device: PyTorch device on which to run the calculation.
+    """
 
     # verify_config()
     checkpoint = None

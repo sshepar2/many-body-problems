@@ -4,12 +4,22 @@ from .wavefunction import WaveFunction
 from .hamiltonian import kinetic_energy, potential_energy
 
 @torch.no_grad()
-def metropolis_step(pos, wf, atoms, step_size=0.5):
-    """
-    pos:       torch.Tensor(batch, nelec, ndim) -current electron positions
-    wf:        WaveFunction(nn.Module)          -wavefunction model
-    atoms:     torch.Tensor(natoms, ndim)       -nuclear positions
-    step_size: float                            -size of cube for random move
+def metropolis_step(
+    pos: torch.Tensor(nwalkers, nelec, ndim), 
+    wf: WaveFunction(nn.Module),
+    atoms: torch.Tensor(natoms, ndim),
+    step_size: float = 0.5
+) -> torch.Tensor(nwalkers, nelec, ndim), torch.float:
+    """Metropolis Step.
+
+    Args:
+        pos: Current electron positions.
+        wf: Wave function model.
+        atoms: Positions of nuclei.
+        step_size: Size of cube for random move.
+    Returns:
+        pos: New electron positions.
+        accept.float().mean().item(): Acceptance averaged over walker dimension.
     """
 
     # Propose move
@@ -31,35 +41,59 @@ def metropolis_step(pos, wf, atoms, step_size=0.5):
 
     return pos, accept.float().mean().item()
 
+
 @torch.no_grad()
-def thermalize(pos, wf, atoms, n_therm=500, step_size=0.5):
+def thermalize(
+    pos: torch.Tensor(nwalkers, nelec, ndim),
+    wf: WaveFunction(nn.Module),
+    atoms: torch.Tensor(natoms, ndim),
+    ntherm: int = 500,
+    step_size: float = 0.5
+) -> torch.Tensor(nwalkers, nelec, ndim):
+    """Run Metropolis burn-in for a single walker.
+    
+    Args:
+        pos: Current electron positions.
+        wf: Wave function model.
+        atoms: Positions of nuclei.
+        ntherm: Number of correlated samples to throw away during equilibration
+        step_size: Size of cube for random move.
+    Returns:
+        pos: New electron positions after ntherm samples.   
     """
-    Run Metropolis burn-in for a single walker.
-    pos:       torch.Tensor(batch, nelec, ndim)
-    wf:        WaveFunction(nn.Module)
-    atoms:     torch.Tensor(natoms, ndim)
-    n_therm:   int
-    step_size: float
-    """
+
     print(f"    Thermalizing for {n_therm} steps...")
 
     acc = 0
-    for _ in range(n_therm):
+    for _ in range(ntherm):
         pos, accepted = metropolis_step(pos, wf, atoms, step_size)
         if accepted:
             acc += accepted
 
-    print(f"    Thermalization acceptance rate: {acc / n_therm:.3f}")
+    print(f"    Thermalization acceptance rate: {acc / ntherm:.3f}")
     return pos
 
-def estimate_energy(pos, wf, atoms, Z, nsamples=1000, step_size=0.5):
-    """
-    pos:       torch.Tensor(batch, nelec, ndim)
-    wf:        WaveFunction(nn.Module)
-    atoms:     torch.Tensor(natoms, ndim)
-    Z:         torch.Tensor(natoms,)
-    nsamples:  int
-    step_size: float
+
+def estimate_energy(
+    pos: torch.Tensor(nwalkers, nelec, ndim),
+    wf: WaveFunction(nn.Module),
+    atoms: torch.Tensor(natoms, ndim),
+    Z: torch.Tensor(natoms,),
+    nsamples: int = 1000,
+    step_size: float = 0.5
+) -> torch.float, torch.float:
+    """Estimate energy using Metropolis
+
+    Args:
+        pos: Current electron positions.
+        wf: Wave function model.
+        atoms: Positions of nuclei.
+        Z: Charges on nuclei, matching the order in atoms tensor.
+        nsamples: Number of correlated samples to calculate
+        step_size: Size of cube for random move.
+    Returns:
+        E_mean.mean(): Mean of local energy.
+        E_std: Standard deviation of local energy. (Leads to an estimate in sem)
     """
 
     print(f"    Sampling for {nsamples} steps...")
@@ -92,15 +126,27 @@ def estimate_energy(pos, wf, atoms, Z, nsamples=1000, step_size=0.5):
 
     return E_mean.mean(), E_std
 
-def estimate_energy_tensor(pos, wf, atoms, Z, nsamples=1000, step_size=0.5):
-    """
-    pos:       torch.Tensor(batch, nelec, ndim)
-    wf:        WaveFunction(nn.Module)
-    atoms:     torch.Tensor(natoms, ndim)
-    Z:         torch.Tensor(natoms,)
-    nsamples:  int
-    step_size: float
-    returns: ke, pe torch.Tensor(nsamples, batch)
+
+def estimate_energy_tensor(
+    pos: torch.Tensor(nwalkers, nelec, ndim),
+    wf: WaveFunction(nn.Module),
+    atoms: torch.Tensor(natoms, ndim),
+    Z: torch.Tensor(natoms,),
+    nsamples: int = 1000,
+    step_size: float = 0.5
+) -> torch.Tensor(nsamples, nwalkers), torch.Tensor(nsamples, nwalkers):
+    """Estimate energy using Metropolis, retains all sample kinetic and potential energies.
+
+    Args:
+        pos: Current electron positions.
+        wf: Wave function model.
+        atoms: Positions of nuclei.
+        Z: Charges on nuclei, matching the order in atoms tensor.
+        nsamples: Number of correlated samples to calculate
+        step_size: Size of cube for random move.
+    Returns:
+        torch.stack(ke): Sample and walker resolved kinetic energies.
+        torch.stack(pe): Sample and walker resolved potenial energies.
     """
 
     print(f"    Sampling for {nsamples} steps...")
