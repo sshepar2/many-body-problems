@@ -10,13 +10,13 @@ Real-space variational quantum Monte Carlo using FermiNet-style neural-network w
 - Electron-electron and electron-nuclear Jastrow factors
 - Envelope functions for orbital/wave function localization
 - Configurable neural-network architecture
-- Saving/Loading train wave functions and optimization states
+- Loading/Saving trained wave functions and optimization states
 - Example optimization and sampling scripts
 
 ## Requirements
 
-- uv
 - Python 3.10+
+- [uv](https://docs.astral.sh/uv/)
 
 ## Setup
 
