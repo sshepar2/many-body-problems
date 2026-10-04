@@ -34,7 +34,7 @@ You only need to rerun the command `uv sync` after deleting `.venv` or changing 
 
 ## Examples
 
-Example optimization and sampling calculation scripts under `examples/`. Saved wave function states are located in files prefixed with `wf-` and ending in `.pt`. 
+Example optimization and sampling calculation scripts can be found under `examples/`. Saved wave function states are located in files prefixed with `wf-` and ending in `.pt`. 
 
 Run an optimization with:
 
@@ -52,11 +52,11 @@ These example scripts can be modified to change the physical system, wave functi
 
 ## Saved Wave Functions
 
-Wave function states are saved as PyTorch `.pt` files. These files contain the information required to reconstruct the wave function as well as optimization settings and calculation metadata.
+Wave function states are saved as PyTorch `.pt` files. These files contain the information required to reconstruct the wave function. They also contain optimization settings and calculation data.
 
 ## Scripts
 
-The helper script `scripts/check.py` can be used to inspect save wave function and calculation state files. In order of increasing detail:
+The helper script `scripts/check.py` can be used to inspect saved wave function and calculation state files. In order of increasing detail:
 
 ```bash
 uv run check.py wf-file.pt
@@ -64,10 +64,11 @@ uv run check.py --model wf-file.pt
 uv run check.py --model --parameters wf-file.pt
 ```
 
-The first command displays general information about the saved calculation, including system and optimization settings as raw data of sampled quantities. The `--model` flag adds wave function configuration, including parameter counts, to the output, while `--parameters` displays the wave function parameters values as well.
+The first command displays general information about the saved calculation, including system and optimization settings and the raw data of sampled quantities. The `--model` flag adds wave function configuration informatoin, including parameter counts, to the output while `--parameters` displays the wave function parameter values as well.
 
 ## Project Structure
 
+```bash
 many-body-problems
 ├── examples/       # Example optimizations and sampling calculations
 ├── scripts/        # Helper and inspection scripts
@@ -75,5 +76,5 @@ many-body-problems
 ├── trained_models/ # Pretrained models with wave function and optimization details 
 ├── pyproject.toml
 └── uv.lock
-
+```
 
