@@ -1,0 +1,336 @@
+──────────────────────────────────────────────────────────────
+Torch / CUDA Information
+──────────────────────────────────────────────────────────────
+Torch: 2.11.0+cu130
+CUDA available: True
+Torch CUDA: 13.0
+GPU: NVIDIA A100-SXM4-40GB
+Compute capability: (8, 0)
+Memory allocated: 0.0 MB
+Memory reserved: 0.0 MB
+Using device: cuda
+Threads: 6
+Interop Threads: 6
+torch.Tensor precision: torch.float32
+ ┌──────┐
+─┤ LOGO ├────────────────────────────────────────────────────┐
+ └──────┘
+[34m          ┌────────────────────────────────────────┐
+          │         ╭╮            ╭╮             ╭╯│
+          │     ╭───╯│╭╮╭╮  ╭──╮  ││ ─╮        ╭─╯ │
+          │    ╭╯    ││╰╯│  │  ╯  ││╭─╯     ╭──╯   │
+          ─────╯     ╰╯  │  │╭─╯  │╰╯   ╭╮╭─┤      │
+          │              ╰─╮││ ╭──╯╮    │╰╯ ╰──╮   │
+          │                ││╰─╯   ╰────╯      ╰─╮ │
+          │ SS             ╰╯                    ╰╮│
+          └────────────────────────────────────────┘[0m
+                                                     ┌─────┐
+─────────────────────────────────────────────────────┤ ART ├─┘
+                                                     └─────┘
+Wave function loaded from checkpoint.
+┌────────────────────────────────────────────────────────────┐
+│ Config: Wavefunction                                       │
+└────────────────────────────────────────────────────────────┘
+   │ n_electrons: (1, 1)
+   │ n_atoms: 2
+   │ charges: (1, 1)
+   │ n_dim: 3
+   │ n_determinants: 1
+   │ full_det: False
+   │ en_poly_order: 1
+   │ ee_poly_order: 1
+   │ hidden_dims: ((128, 16), (128, 16), (128, 16))
+   │ bias_orbitals: False
+   │ init_orbitals_as_constant: False
+   │ use_envelope: True
+   │ tie_spin_orbitals: False
+   │ checkpoint_load_path: ./h2-1-1-1_041.pt
+┌────────────────────────────────────────────────────────────┐
+│ Config: VMC Setup                                          │
+└────────────────────────────────────────────────────────────┘
+   │ seed: None
+   │ n_walkers: 65536
+   │ n_steps: 32
+   │ n_blocks: 12
+   │ epochs: 20
+   │ block_ramp: 1.005
+   │ met_step: 0.3
+   │ n_therm: 50
+   │ freeze: None
+   │ optimizer: adam
+   │ lr: 3e-05
+   │ scheduler: False
+   │ gamma: 0.95
+   │ print_autocorr: False
+   │ checkpoint_save_path: ./h2-1-1-1_042.pt
+──────────────────────────────────────────────────────────────
+Optimizer loaded from checkpoint.
+┌────────────────────────────────────────────────────────────┐
+│ Start: VMC Optimization (Epochs 20)                        │
+└────────────────────────────────────────────────────────────┘
+    Thermalizing for 50 steps...
+    Thermalization acceptance rate: 0.660
+    Starting optimization loop.
+    ┌──────────────────┬─────────────────────────────────────┐
+    │ Epoch: 1 of 20   │ Samples: 25,165,824 (Walkers: 65,536) │
+    └──────────────────┴─────────────────────────────────────┘
+    │ Local Energy     = -1.1677 ± 0.0002 Ha
+    │ Kinetic Energy   = 1.207 ± 0.002 Ha
+    │ Potential Energy = -2.375 ± 0.002 Ha
+    │ Energy Variance:   0.045 ± N/A Ha^2
+    │ Acceptance:        0.655
+    │ LR:                0.000030
+    Checkpoint saved to ./h2-1-1-1_042.pt-1of20.
+    ┌──────────────────┬─────────────────────────────────────┐
+    │ Epoch: 2 of 20   │ Samples: 25,165,824 (Walkers: 65,536) │
+    └──────────────────┴─────────────────────────────────────┘
+    Thermalizing for 25 steps...
+    Thermalization acceptance rate: 0.654
+    │ Local Energy     = -1.1678 ± 0.0002 Ha
+    │ Kinetic Energy   = 1.211 ± 0.002 Ha
+    │ Potential Energy = -2.379 ± 0.002 Ha
+    │ Energy Variance:   0.045 ± N/A Ha^2
+    │ Acceptance:        0.655
+    │ LR:                0.000030
+    Checkpoint saved to ./h2-1-1-1_042.pt-2of20.
+    ┌──────────────────┬─────────────────────────────────────┐
+    │ Epoch: 3 of 20   │ Samples: 25,165,824 (Walkers: 65,536) │
+    └──────────────────┴─────────────────────────────────────┘
+    Thermalizing for 25 steps...
+    Thermalization acceptance rate: 0.655
+    │ Local Energy     = -1.1678 ± 0.0002 Ha
+    │ Kinetic Energy   = 1.215 ± 0.002 Ha
+    │ Potential Energy = -2.383 ± 0.002 Ha
+    │ Energy Variance:   0.044 ± N/A Ha^2
+    │ Acceptance:        0.654
+    │ LR:                0.000030
+    Checkpoint saved to ./h2-1-1-1_042.pt-3of20.
+    ┌──────────────────┬─────────────────────────────────────┐
+    │ Epoch: 4 of 20   │ Samples: 25,165,824 (Walkers: 65,536) │
+    └──────────────────┴─────────────────────────────────────┘
+    Thermalizing for 25 steps...
+    Thermalization acceptance rate: 0.655
+    │ Local Energy     = -1.1678 ± 0.0002 Ha
+    │ Kinetic Energy   = 1.208 ± 0.002 Ha
+    │ Potential Energy = -2.376 ± 0.002 Ha
+    │ Energy Variance:   0.047 ± N/A Ha^2
+    │ Acceptance:        0.655
+    │ LR:                0.000030
+    Checkpoint saved to ./h2-1-1-1_042.pt-4of20.
+    ┌──────────────────┬─────────────────────────────────────┐
+    │ Epoch: 5 of 20   │ Samples: 25,165,824 (Walkers: 65,536) │
+    └──────────────────┴─────────────────────────────────────┘
+    Thermalizing for 25 steps...
+    Thermalization acceptance rate: 0.654
+    │ Local Energy     = -1.1676 ± 0.0002 Ha
+    │ Kinetic Energy   = 1.221 ± 0.002 Ha
+    │ Potential Energy = -2.389 ± 0.002 Ha
+    │ Energy Variance:   0.043 ± N/A Ha^2
+    │ Acceptance:        0.653
+    │ LR:                0.000030
+    Checkpoint saved to ./h2-1-1-1_042.pt-5of20.
+    ┌──────────────────┬─────────────────────────────────────┐
+    │ Epoch: 6 of 20   │ Samples: 25,165,824 (Walkers: 65,536) │
+    └──────────────────┴─────────────────────────────────────┘
+    Thermalizing for 25 steps...
+    Thermalization acceptance rate: 0.656
+    │ Local Energy     = -1.1675 ± 0.0002 Ha
+    │ Kinetic Energy   = 1.201 ± 0.002 Ha
+    │ Potential Energy = -2.368 ± 0.002 Ha
+    │ Energy Variance:   0.045 ± N/A Ha^2
+    │ Acceptance:        0.656
+    │ LR:                0.000030
+    Checkpoint saved to ./h2-1-1-1_042.pt-6of20.
+    ┌──────────────────┬─────────────────────────────────────┐
+    │ Epoch: 7 of 20   │ Samples: 25,165,824 (Walkers: 65,536) │
+    └──────────────────┴─────────────────────────────────────┘
+    Thermalizing for 25 steps...
+    Thermalization acceptance rate: 0.654
+    │ Local Energy     = -1.1678 ± 0.0002 Ha
+    │ Kinetic Energy   = 1.218 ± 0.002 Ha
+    │ Potential Energy = -2.386 ± 0.002 Ha
+    │ Energy Variance:   0.044 ± N/A Ha^2
+    │ Acceptance:        0.654
+    │ LR:                0.000030
+    Checkpoint saved to ./h2-1-1-1_042.pt-7of20.
+    ┌──────────────────┬─────────────────────────────────────┐
+    │ Epoch: 8 of 20   │ Samples: 25,165,824 (Walkers: 65,536) │
+    └──────────────────┴─────────────────────────────────────┘
+    Thermalizing for 25 steps...
+    Thermalization acceptance rate: 0.655
+    │ Local Energy     = -1.1679 ± 0.0002 Ha
+    │ Kinetic Energy   = 1.209 ± 0.002 Ha
+    │ Potential Energy = -2.377 ± 0.002 Ha
+    │ Energy Variance:   0.044 ± N/A Ha^2
+    │ Acceptance:        0.655
+    │ LR:                0.000030
+    Checkpoint saved to ./h2-1-1-1_042.pt-8of20.
+    ┌──────────────────┬─────────────────────────────────────┐
+    │ Epoch: 9 of 20   │ Samples: 25,165,824 (Walkers: 65,536) │
+    └──────────────────┴─────────────────────────────────────┘
+    Thermalizing for 25 steps...
+    Thermalization acceptance rate: 0.655
+    │ Local Energy     = -1.1678 ± 0.0002 Ha
+    │ Kinetic Energy   = 1.211 ± 0.002 Ha
+    │ Potential Energy = -2.379 ± 0.002 Ha
+    │ Energy Variance:   0.045 ± N/A Ha^2
+    │ Acceptance:        0.655
+    │ LR:                0.000030
+    Checkpoint saved to ./h2-1-1-1_042.pt-9of20.
+    ┌───────────────────┬────────────────────────────────────┐
+    │ Epoch: 10 of 20   │ Samples: 25,165,824 (Walkers: 65,536) │
+    └───────────────────┴────────────────────────────────────┘
+    Thermalizing for 25 steps...
+    Thermalization acceptance rate: 0.654
+    │ Local Energy     = -1.1679 ± 0.0002 Ha
+    │ Kinetic Energy   = 1.215 ± 0.002 Ha
+    │ Potential Energy = -2.383 ± 0.002 Ha
+    │ Energy Variance:   0.044 ± N/A Ha^2
+    │ Acceptance:        0.654
+    │ LR:                0.000030
+    Checkpoint saved to ./h2-1-1-1_042.pt-10of20.
+    ┌───────────────────┬────────────────────────────────────┐
+    │ Epoch: 11 of 20   │ Samples: 25,165,824 (Walkers: 65,536) │
+    └───────────────────┴────────────────────────────────────┘
+    Thermalizing for 25 steps...
+    Thermalization acceptance rate: 0.656
+    │ Local Energy     = -1.1678 ± 0.0002 Ha
+    │ Kinetic Energy   = 1.206 ± 0.002 Ha
+    │ Potential Energy = -2.374 ± 0.002 Ha
+    │ Energy Variance:   0.046 ± N/A Ha^2
+    │ Acceptance:        0.656
+    │ LR:                0.000030
+    Checkpoint saved to ./h2-1-1-1_042.pt-11of20.
+    ┌───────────────────┬────────────────────────────────────┐
+    │ Epoch: 12 of 20   │ Samples: 25,165,824 (Walkers: 65,536) │
+    └───────────────────┴────────────────────────────────────┘
+    Thermalizing for 25 steps...
+    Thermalization acceptance rate: 0.653
+    │ Local Energy     = -1.1676 ± 0.0002 Ha
+    │ Kinetic Energy   = 1.225 ± 0.002 Ha
+    │ Potential Energy = -2.392 ± 0.002 Ha
+    │ Energy Variance:   0.044 ± N/A Ha^2
+    │ Acceptance:        0.653
+    │ LR:                0.000030
+    Checkpoint saved to ./h2-1-1-1_042.pt-12of20.
+    ┌───────────────────┬────────────────────────────────────┐
+    │ Epoch: 13 of 20   │ Samples: 25,165,824 (Walkers: 65,536) │
+    └───────────────────┴────────────────────────────────────┘
+    Thermalizing for 25 steps...
+    Thermalization acceptance rate: 0.655
+    │ Local Energy     = -1.1678 ± 0.0002 Ha
+    │ Kinetic Energy   = 1.209 ± 0.002 Ha
+    │ Potential Energy = -2.377 ± 0.002 Ha
+    │ Energy Variance:   0.044 ± N/A Ha^2
+    │ Acceptance:        0.655
+    │ LR:                0.000030
+    Checkpoint saved to ./h2-1-1-1_042.pt-13of20.
+    ┌───────────────────┬────────────────────────────────────┐
+    │ Epoch: 14 of 20   │ Samples: 25,165,824 (Walkers: 65,536) │
+    └───────────────────┴────────────────────────────────────┘
+    Thermalizing for 25 steps...
+    Thermalization acceptance rate: 0.655
+    │ Local Energy     = -1.1681 ± 0.0002 Ha
+    │ Kinetic Energy   = 1.208 ± 0.002 Ha
+    │ Potential Energy = -2.376 ± 0.002 Ha
+    │ Energy Variance:   0.044 ± N/A Ha^2
+    │ Acceptance:        0.655
+    │ LR:                0.000030
+    Checkpoint saved to ./h2-1-1-1_042.pt-14of20.
+    ┌───────────────────┬────────────────────────────────────┐
+    │ Epoch: 15 of 20   │ Samples: 25,165,824 (Walkers: 65,536) │
+    └───────────────────┴────────────────────────────────────┘
+    Thermalizing for 25 steps...
+    Thermalization acceptance rate: 0.653
+    │ Local Energy     = -1.1678 ± 0.0002 Ha
+    │ Kinetic Energy   = 1.219 ± 0.002 Ha
+    │ Potential Energy = -2.387 ± 0.002 Ha
+    │ Energy Variance:   0.043 ± N/A Ha^2
+    │ Acceptance:        0.653
+    │ LR:                0.000030
+    Checkpoint saved to ./h2-1-1-1_042.pt-15of20.
+    ┌───────────────────┬────────────────────────────────────┐
+    │ Epoch: 16 of 20   │ Samples: 25,165,824 (Walkers: 65,536) │
+    └───────────────────┴────────────────────────────────────┘
+    Thermalizing for 25 steps...
+    Thermalization acceptance rate: 0.657
+    │ Local Energy     = -1.1679 ± 0.0002 Ha
+    │ Kinetic Energy   = 1.202 ± 0.002 Ha
+    │ Potential Energy = -2.369 ± 0.002 Ha
+    │ Energy Variance:   0.046 ± N/A Ha^2
+    │ Acceptance:        0.656
+    │ LR:                0.000030
+    Checkpoint saved to ./h2-1-1-1_042.pt-16of20.
+    ┌───────────────────┬────────────────────────────────────┐
+    │ Epoch: 17 of 20   │ Samples: 25,165,824 (Walkers: 65,536) │
+    └───────────────────┴────────────────────────────────────┘
+    Thermalizing for 25 steps...
+    Thermalization acceptance rate: 0.654
+    │ Local Energy     = -1.1679 ± 0.0002 Ha
+    │ Kinetic Energy   = 1.213 ± 0.002 Ha
+    │ Potential Energy = -2.381 ± 0.002 Ha
+    │ Energy Variance:   0.043 ± N/A Ha^2
+    │ Acceptance:        0.654
+    │ LR:                0.000030
+    Checkpoint saved to ./h2-1-1-1_042.pt-17of20.
+    ┌───────────────────┬────────────────────────────────────┐
+    │ Epoch: 18 of 20   │ Samples: 27,262,976 (Walkers: 65,536) │
+    └───────────────────┴────────────────────────────────────┘
+    Thermalizing for 25 steps...
+    Thermalization acceptance rate: 0.655
+    │ Local Energy     = -1.1679 ± 0.0002 Ha
+    │ Kinetic Energy   = 1.213 ± 0.002 Ha
+    │ Potential Energy = -2.381 ± 0.002 Ha
+    │ Energy Variance:   0.043 ± N/A Ha^2
+    │ Acceptance:        0.654
+    │ LR:                0.000030
+    Checkpoint saved to ./h2-1-1-1_042.pt-18of20.
+    ┌───────────────────┬────────────────────────────────────┐
+    │ Epoch: 19 of 20   │ Samples: 27,262,976 (Walkers: 65,536) │
+    └───────────────────┴────────────────────────────────────┘
+    Thermalizing for 25 steps...
+    Thermalization acceptance rate: 0.655
+    │ Local Energy     = -1.1679 ± 0.0002 Ha
+    │ Kinetic Energy   = 1.205 ± 0.002 Ha
+    │ Potential Energy = -2.373 ± 0.002 Ha
+    │ Energy Variance:   0.045 ± N/A Ha^2
+    │ Acceptance:        0.656
+    │ LR:                0.000030
+    Checkpoint saved to ./h2-1-1-1_042.pt-19of20.
+    ┌───────────────────┬────────────────────────────────────┐
+    │ Epoch: 20 of 20   │ Samples: 27,262,976 (Walkers: 65,536) │
+    └───────────────────┴────────────────────────────────────┘
+    Thermalizing for 25 steps...
+    Thermalization acceptance rate: 0.653
+    │ Local Energy     = -1.1678 ± 0.0002 Ha
+    │ Kinetic Energy   = 1.226 ± 0.002 Ha
+    │ Potential Energy = -2.394 ± 0.002 Ha
+    │ Energy Variance:   0.044 ± N/A Ha^2
+    │ Acceptance:        0.653
+    │ LR:                0.000030
+    Checkpoint saved to ./h2-1-1-1_042.pt-20of20.
+
+──────────────────────────────────────────────────────────────
+┌────────────────────────────────────────────────────────────┐
+│ Start: Final Energy Sampling                               │
+└────────────────────────────────────────────────────────────┘
+    Thermalizing for 50 steps...
+    Thermalization acceptance rate: 0.654
+    Sampling for 416 steps...
+    Sampling acceptance rate: 0.655
+Neff 851968
+std tensor(0.0864, device='cuda:0')
+total samples used to calculate variance 27262976
+
+──────────────────────────────────────────────────────────────
+┌────────────────────────────────────────────────────────────┐
+│  Final Electronic Energy: -1.869964 ± 0.000094 Ha          │
+└────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────┐
+│  Total Energy: -1.167717 ± 0.000094 Ha                     │
+└────────────────────────────────────────────────────────────┘
+──────────────────────────────────────────────────────────────
+Checkpoint saved to ./h2-1-1-1_042.pt.
+
+For H2 @ R=1.424 bohr
+    Exact Total Energy ≈ -1.1745 Ha

@@ -1,0 +1,55 @@
+name: h2-ground-state-v1
+
+system:
+  molecule: H2
+  n_electrons: [1, 1]
+  charges: [1, 1]
+  geometry:
+    units: bohr
+    atoms:
+      - [0.0, 0.0, -0.712]
+      - [0.0, 0.0,  0.712]
+
+wavefunction:
+  n_determinants: 1
+  hidden_dims:
+    - [128, 16]
+    - [128, 16]
+    - [128, 16]
+  envelope: exponential_nodeless
+  jastrow_en_order: 1
+  jastrow_ee_order: 1
+  dtype: float32
+  n_parameters: 123456
+
+training:
+  optimizer: adam
+  epochs: 830
+  walkers: 65536
+  block_size: 32
+  acceptance: 0.66
+
+results:
+  energy_ha: -1.167717
+  energy_sem_ha: 0.000094
+  reference_energy_ha: -1.1745
+  delta_energy_ha: 0.006783
+
+  kinetic_energy_ha: 1.226
+  kinetic_energy_sem_ha: 0.002
+
+  potential_energy_ha: -2.394
+  potential_energy_sem_ha: 0.002
+
+  local_energy_variance_ha2: 0.044
+  virial_ratio: 0.976
+
+checkpoint:
+  file: h2-1-1-1_042.pt
+  epoch: 830 
+
+provenance:
+  git_commit: 
+  torch: "2.11.0"
+  cuda: "13.0"
+  device: "NVIDIA A100-SXM4-40GB"
