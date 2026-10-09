@@ -1,13 +1,99 @@
 import torch
+from .utils import print_section
 
-def autocorr(energies, lag):
+def autocorr(
+    energies: torch.Tensor, # (nsamples, nwalkers)
+    kmax: int = None,
+    threshold: float = 1e-2
+) -> tuple[torch.float, int]:
+    """Calculates the integrated autocorrelation time, 2τ, up to
+    some cutoff offset value, kmax, averaged over walkers.
+
+    τ = 0.5 + Σ ρ(k);  ρ(k) = C(k) / C(0) 
+
+        ρ(k): normalized autocorrelation function at lag k.
+        C(k): autocovariance at lag k.
+        C(0): autocovariance at lag k=0, i.e. the variance.
+
+    Args:
+       energies: Raw ordered correlated local energy samples 
+       for each walker
+       kmax: Cutoff value for the sum over offset values
+       threshold: Values below which ρ(k) are considered
+       negligible in the sum. Print output will include a note
+       for each term which falls below this value.
     """
-    Checks autocorrelation function for batch
-    energies: torch.Tensor(nsteps, batch)
-    lag: int
+
+    nsamples, nwalkers = energies.shape
+
+    print_section("Diagnostic", f"Autocorrelation time (Walkers: {nwalkers})")
+
+    # quality check nsample
+    if nsamples < 20:
+        print(f"    Warning: A sample size of {nsamples} is small, the analysis may be noisy")
+        print("    or unreliable. It is recommended to use roughly 10x the expected block size")
+
+    if kmax:
+        # error check kmax (if provided manually)
+        if not 1 <= kmax < nsamples:
+            raise ValueError(f"    kmax ({kmax}) must satisfy 1 <= kmax < nsamples (nsamples).")
+        # quality check kmax (if provided manually)
+        if kmax < 5 or kmax > min(nsamples // 2, 1000):
+            print(f"    Warning: You have provided a kmax value of {kmax} which seems unreasonable.")
+            print("    It is recommended to leave kmax as None and let it be handled automatically")
+    else:
+        # set kmax if not provided
+        kmax = min(nsamples // 2, 1000)
+
+    print(f"    Max k:          {kmax} (should stop sooner)")
+    print(f"    ρ(k) threshold: {threshold:.2e} (ρ_min)")
+    print(f"    Averaging over: {nwalkers} walkers\n")
+
+    print("    ┌" + "─"*12 + "┬" + "─"*8 + "┬" + "─"*8 + "┬" + "─"*9 + "┐")
+    print(f"    │ Offset (k) │  ρ(k)  │ <ρ_min │    2τ   │")
+    print("    ├" + "─"*12 + "┼" + "─"*8 + "┼" + "─"*8 + "┼" + "─"*9 + "┤")
+    print(f"    │          0 │  0.500 │      N │   1.000 │")
+
+    tau = torch.tensor(0.5)
+    for k in range(1, kmax + 1):
+        rho_k = _autocorr_k(energies, k) # (nwalkers,)
+        rho_k = torch.mean(rho_k)
+        tau += rho_k
+        below = "N"
+        if abs(rho_k) < threshold:
+            below = "Y"
+        
+        print(f"    │ {k:10d} │ {rho_k:6.3f} │      {below} │ {2*tau:7.3f} │")
+        if k >= 5 * tau and k >= 5 and below == "Y":
+            break
+
+    print("    └" + "─"*12 + "┴" + "─"*8 + "┴" + "─"*8 + "┴" + "─"*9 + "┘")
+
+    if not k < kmax:
+        print("\n    ┌Warning: Max lag (kmax) reached. Results may be unreliable.")
+        print("    │    Try decreasing met_step and increasing total samples.")
+
+    return tau, k
+
+def _autocorr_k(
+    energies: torch.Tensor, # (nsamples, nwalkers)
+    k: int
+) -> torch.Tensor: # (1,)
+    """Calculates the normalized autocorrelation function 
+    at offest k, ρ(k), for each walker.
+    
+    Args:
+        energies: Raw sampled local energies
+        k: Offset of correlated local energy samples
+    Returns:
+        rho_k: 
     """
-    energies = energies - torch.mean(energies, dim=0) # (nsteps, batch) - (1, batch)
-    return torch.mean(energies[lag:, :] * energies[:-lag, :], dim=0) / torch.var(energies, dim=0, unbiased=False) # /N (biased) instead of /(N-1)
+    #energies = energies - torch.mean(energies, dim=0) # (nsamples, batch) - (1, batch)
+    energies -= torch.mean(energies) # (nsamples, batch) - (1,), global ave prevents neg. corr. tail
+    auto_cov_k = torch.mean(energies[k:, :] * energies[:-k, :], dim=0) 
+    var = torch.var(energies, dim=0, unbiased=False) # /N (biased) instead of /(N-1)
+    rho_k = auto_cov_k / var
+    return rho_k
 
 class DensityAccumulator:
     def __init__(self, zmin=-3.0, zmax=3.0, nbins=200):

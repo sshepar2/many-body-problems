@@ -1,15 +1,16 @@
 import torch
+from tqdm import tqdm
 
 from .wavefunction import WaveFunction
 from .hamiltonian import kinetic_energy, potential_energy
 
 @torch.no_grad()
 def metropolis_step(
-    pos: torch.Tensor(nwalkers, nelec, ndim), 
-    wf: WaveFunction(nn.Module),
-    atoms: torch.Tensor(natoms, ndim),
+    pos: torch.Tensor, # (nwalkers, nelec, ndim), 
+    wf: WaveFunction, # (nn.Module)
+    atoms: torch.Tensor, # (natoms, ndim),
     step_size: float = 0.5
-) -> torch.Tensor(nwalkers, nelec, ndim), torch.float:
+) -> tuple[torch.Tensor, torch.float]: # (nwalkers, nelec, ndim)
     """Metropolis Step.
 
     Args:
@@ -44,44 +45,44 @@ def metropolis_step(
 
 @torch.no_grad()
 def thermalize(
-    pos: torch.Tensor(nwalkers, nelec, ndim),
-    wf: WaveFunction(nn.Module),
-    atoms: torch.Tensor(natoms, ndim),
-    ntherm: int = 500,
+    pos: torch.Tensor, # (nwalkers, nelec, ndim)
+    wf: WaveFunction, # (nn.Module)
+    atoms: torch.Tensor, # (natoms, ndim)
+    n_therm: int = 500,
     step_size: float = 0.5
-) -> torch.Tensor(nwalkers, nelec, ndim):
+) -> torch.Tensor: # (nwalkers, nelec, ndim)
     """Run Metropolis burn-in for a single walker.
     
     Args:
         pos: Current electron positions.
         wf: Wave function model.
         atoms: Positions of nuclei.
-        ntherm: Number of correlated samples to throw away during equilibration
+        n_therm: Number of correlated samples to throw away during equilibration
         step_size: Size of cube for random move.
     Returns:
-        pos: New electron positions after ntherm samples.   
+        pos: New electron positions after n_therm samples.   
     """
 
     print(f"    Thermalizing for {n_therm} steps...")
 
     acc = 0
-    for _ in range(ntherm):
+    for _ in range(n_therm):
         pos, accepted = metropolis_step(pos, wf, atoms, step_size)
         if accepted:
             acc += accepted
 
-    print(f"    Thermalization acceptance rate: {acc / ntherm:.3f}")
+    print(f"    Thermalization acceptance rate: {acc / n_therm:.3f}")
     return pos
 
 
 def estimate_energy(
-    pos: torch.Tensor(nwalkers, nelec, ndim),
-    wf: WaveFunction(nn.Module),
-    atoms: torch.Tensor(natoms, ndim),
-    Z: torch.Tensor(natoms,),
+    pos: torch.Tensor, # (nwalkers, nelec, ndim)
+    wf: WaveFunction, # (nn.Module)
+    atoms: torch.Tensor, # (natoms, ndim)
+    Z: torch.Tensor, # (natoms,)
     nsamples: int = 1000,
     step_size: float = 0.5
-) -> torch.float, torch.float:
+) -> tuple[torch.float, torch.float]:
     """Estimate energy using Metropolis
 
     Args:
@@ -128,13 +129,13 @@ def estimate_energy(
 
 
 def estimate_energy_tensor(
-    pos: torch.Tensor(nwalkers, nelec, ndim),
-    wf: WaveFunction(nn.Module),
-    atoms: torch.Tensor(natoms, ndim),
-    Z: torch.Tensor(natoms,),
+    pos: torch.Tensor, # (nwalkers, nelec, ndim)
+    wf: WaveFunction, # (nn.Module)
+    atoms: torch.Tensor, # (natoms, ndim)
+    Z: torch.Tensor, # (natoms,)
     nsamples: int = 1000,
     step_size: float = 0.5
-) -> torch.Tensor(nsamples, nwalkers), torch.Tensor(nsamples, nwalkers):
+) -> tuple[torch.Tensor, torch.Tensor, torch.float]: # (nsamples, nwalkers)
     """Estimate energy using Metropolis, retains all sample kinetic and potential energies.
 
     Args:
@@ -155,7 +156,16 @@ def estimate_energy_tensor(
     pe = []
     acc = 0
 
-    for i in range(nsamples):
+    # for tqdm
+    samples = range(nsamples)
+    for _ in tqdm(
+        samples,
+        desc="    ┌Sampling",
+        unit=" Batch Steps",
+        ncols=62,
+        bar_format="{desc}: {percentage:3.0f}%|{bar}| {n_fmt}/{total_fmt} {rate_fmt}"
+    ):
+    # for _ in range(nsamples):
         with torch.no_grad():
             pos, accepted = metropolis_step(pos, wf, atoms, step_size)
             if accepted:
@@ -169,7 +179,7 @@ def estimate_energy_tensor(
         pe.append(potential_energy(pos_sample, atoms, Z).detach())
 
     accept_rate = acc / nsamples
-    print(f"    Sampling acceptance rate: {accept_rate:.3f}")
+    print(f"    │ Acceptance rate: {accept_rate:.3f}")
 
-    return torch.stack(ke), torch.stack(pe) # (nsamples, batch)
+    return torch.stack(ke), torch.stack(pe), accept_rate # (nsamples, batch)
 
