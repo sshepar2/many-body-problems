@@ -1,5 +1,7 @@
 name: h2-ground-state-v1
 
+schema-version: 0
+
 system:
   molecule: H2
   n_electrons: [1, 1]
@@ -20,7 +22,7 @@ wavefunction:
   jastrow_en_order: 1
   jastrow_ee_order: 1
   dtype: float32
-  n_parameters: 123456
+  n_parameters: 111595
 
 training:
   optimizer: adam
@@ -49,7 +51,9 @@ checkpoint:
   epoch: 830 
 
 provenance:
-  git_commit: 
+  git_commit: "not available"
+  note: "Training code predates Git history."
+  source_archive: "mbp.tar"
   torch: "2.11.0"
   cuda: "13.0"
   device: "NVIDIA A100-SXM4-40GB"

@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "type": "integer"
+    },
+    "name": {
+      "type": "string"
+    },
+    "system": {
+      "type": "object",
+      "properties": {
+        "molecule": {
+          "type": "string"
+        },
+        "charges": {
+          "type": "array",
+	  "items": {
+            "type": "integer"
+          }
+        },
+	"n_electrons": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+	"geometry": {
+          "type": "object",
+	  "properties": {
+            "units": {
+              "type": "string"
+            },
+            "atoms": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItem": 1
+              }
+            }
+          }
+	}
+      }
+    },
+    "wavefunction": {
+      "type": "object",
+      "properties": {
+        "n_determinants": {
+          "type": "integer"
+        },
+        "hidden_dims": {
+          "type": "array",
+	  "minItems": 1,
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "integer",
+	      "minimum": 1
+            }
+          }
+        },
+	"envelope": {
+          "type": "string"
+        },
+	"jastrow_en_order": {
+          "type": "integer"
+        },
+        "jastrow_ee_order": {
+          "type": "integer"
+        },
+	"dtype": {
+          "type": "string"
+        },
+        "n_parameters": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "training": {
+      "type": "object",
+      "properties": {
+        "optimizer": {
+          "type": "string"
+        },
+        "epochs": {
+          "type": "integer"
+        },
+	"walkers": {
+          "type": "integer"
+        },
+        "block_size": {
+          "type": "integer"
+        },
+        "acceptance": {
+          "type": "number"
+        }
+      }
+    },
+    "results": {
+      "type": "object",
+      "properties": {
+        "units": {
+          "type": "number"
+        },
+        "energy": {
+          "type": "number"
+        },
+        "energy_sem": {
+          "type": "number"
+        },
+        "reference_energy": {
+          "type": "number"
+        },
+	"delta_energy": {
+          "type": "number"
+        },
+	"kinetic_energy": {
+          "type": "number"
+        },
+	"kinetic_energy_sem": {
+          "type": "number"
+        },
+	"potential_energy": {
+          "type": "number"
+        },
+	"potential_energy_sem": {
+          "type": "number"
+        },
+	"local_energy_variance": {
+          "type": "number"
+        },
+	"virial_ratio": {
+          "type": "number"
+	}
+      }
+    },
+    "checkpoint": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "type": "string"
+        },
+        "epoch": {
+          "type": "integer"
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "properties": {
+        "git_commit": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "source_archive": {
+          "type": "string"
+        },
+        "torch": {
+          "type": "string"
+        },
+        "cuda": {
+          "type": "string"
+        },
+        "device": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
