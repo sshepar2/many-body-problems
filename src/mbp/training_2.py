@@ -18,7 +18,12 @@ def run_vmc(
     atoms: torch.Tensor,
     device: torch.device,
 ):
-    """Runs a variational Monte Carlo optimization
+    """Runs a variational Monte Carlo optimization.
+    For all epochs, the standard errors are calculated using accumulators
+    of raw samples to avoid extra memory costs (take caution 
+    reporting/relying on this error). A final sampling is performed
+    after the final epoch which uses block averages to calculate estimators 
+    for a more accurate estimate of the standard error.
     
     Args:
 
@@ -277,7 +282,13 @@ def run_vmc(
         errfac = 1.0 / (epoch_blocks * nwalkers)**0.5
         
         if epoch > 0: # per epoch thermalization
-            pos = thermalize(pos, wf, atoms, n_therm=vmc_cfg.n_therm // 2, step_size=vmc_cfg.met_step)
+            pos = thermalize(
+                pos,
+                wf,
+                atoms,
+                n_therm=vmc_cfg.n_therm // 2,
+                step_size=vmc_cfg.met_step
+            )
             pos.requires_grad_(True)
 
         # for tqdm
@@ -291,7 +302,12 @@ def run_vmc(
         ):
         #for step in range(epoch_steps):
             with torch.no_grad():
-                pos, accepted = metropolis_step(pos, wf, atoms, step_size=vmc_cfg.met_step)
+                pos, accepted = metropolis_step(
+                    pos,
+                    wf,
+                    atoms,
+                    step_size=vmc_cfg.met_step
+                )
                 if accepted:
                     acc += accepted
 
@@ -376,7 +392,6 @@ def run_vmc(
 
         # update parameters
         if opt_name != 'sr':
-            
             scale = 2.0 / tot_samples
             grads = [p.grad for p in params]
             torch._foreach_add_(
@@ -488,24 +503,45 @@ def run_vmc(
     print_section("Start", "Final Energy Sampling")
     pos = thermalize(pos, wf, atoms, n_therm=vmc_cfg.n_therm, step_size=vmc_cfg.met_step)
     max_blocks = int(nblocks*vmc_cfg.block_ramp**vmc_cfg.epochs)
-    ke_tensor, pe_tensor = estimate_energy_tensor(pos, wf, atoms, Z, nsamples=nsteps*max_blocks, step_size=vmc_cfg.met_step)
+    ke_tensor, pe_tensor = estimate_energy_tensor(
+        pos,
+        wf,
+        atoms,
+        Z,
+        nsamples=nsteps*max_blocks,
+        step_size=vmc_cfg.met_step
+    )
 
     energies_tensor = ke_tensor + pe_tensor
     del ke_tensor, pe_tensor
 
-    e_block_means = energies_tensor.view(max_blocks, nsteps, nwalkers).mean(dim=1) #(nblocks, steps/block, nwalkers)
+    e_block_means = energies_tensor.view(
+        max_blocks,
+        nsteps,
+        nwalkers
+    ).mean(dim=1) #(nblocks, steps/block, nwalkers)
+    
     e_means_flat = e_block_means.reshape(-1) # (epoch_blocks * nwalkers) a list of uncorrelated means
     e_mean = e_means_flat.mean()
     e_std = e_means_flat.std(unbiased=True) # mean sample std (internally / nblocks-1)
+    
     print(f"    Total samples taken {energies_tensor.numel():,d}")
     print(f"    Independent samples {e_means_flat.numel():,d}")
-    e_sem = e_std / e_means_flat.numel()**0.5 # confidence of mean (68% chance mean is within ±e_sem and 95% chance mean is within ±2e_sem)
+    
+    e_sem = e_std / e_means_flat.numel()**0.5 
+    # confidence of mean (68% chance mean is within ±e_sem and 95% chance mean is within ±2e_sem)
     del e_std, e_means_flat, e_block_means
 
     # we want the variance of the local energy (which is zero when in an eigenstate)
     e_local_var = energies_tensor.reshape(-1).var(unbiased=True) # (samples * nwalkers)
+    
     # calculate error bar on the local energy variance estimate
-    e_block_vars = energies_tensor.view(max_blocks, nsteps, nwalkers).var(dim=1, unbiased=True) # (epoch_blocks, nwalkers) get variance for each block
+    e_block_vars = energies_tensor.view(
+        max_blocks,
+        nsteps,
+        nwalkers
+    ).var(dim=1, unbiased=True) # (epoch_blocks, nwalkers) get variance for each block
+    
     e_vars_flat = e_block_vars.reshape(-1) # (epoch_blocks*nwalkers) array of independent variance calcs
     e_var_std = e_vars_flat.std(unbiased=True) # stdev of local energy variance samples
     e_var_sem = e_var_std / e_vars_flat.numel()**0.5 # standard error on local energy variance
@@ -518,7 +554,6 @@ def run_vmc(
     #ke_std = ke_means_flat.std(unbiased=True)
     #ke_sem = ke_std / ke_means_flat.numel()**0.5
     
-
     print(f"\n{'─'*62}")
     print_section(" Final Electronic Energy", f"{e_mean.item():.6f} ± {e_sem.item():.6f} Ha")
     # Add Vnn if you want total energy
