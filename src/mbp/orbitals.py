@@ -275,7 +275,15 @@ class ExponentialEnvelopeNodeless(nn.Module):
     ):
         super().__init__()
 
+        # fine as long as Z is a Sequence
         alpha_init = torch.as_tensor(Z, dtype=torch.get_default_dtype()) # (natoms,)
+        # cleaner
+        #alpha_init = torch.full(
+        #        (natoms,),
+        #        Z,
+        #        dtype=torch.get_default_dtype()
+        #) # (natoms,)
+
         # use for helium
         #alpha_init = torch.as_tensor(1.6875, dtype=torch.get_default_dtype()) # (natoms,)
         alpha_raw = torch.log(torch.expm1(alpha_init)) # (natoms,)
@@ -295,7 +303,7 @@ class ExponentialEnvelopeNodeless(nn.Module):
     ) -> torch.Tensor:
 
         alpha = F.softplus(self.alpha_raw) + 1e-6  # (norbitals, natoms)
-        coeff = F.softmax(self.coeff_raw, dim=-1)  # (norbitals,) initially 1.0
+        coeff = F.softmax(self.coeff_raw, dim=-1)  # (norbitals,) all initially 1/natoms
 
         exp_terms = torch.exp(
             -r_spin.unsqueeze(2) * alpha.unsqueeze(0).unsqueeze(0)

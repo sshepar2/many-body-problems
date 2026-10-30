@@ -54,7 +54,9 @@ def autocorr(
     print("    ├" + "─"*12 + "┼" + "─"*8 + "┼" + "─"*8 + "┼" + "─"*9 + "┤")
     print(f"    │          0 │  0.500 │      N │   1.000 │")
 
-    tau = torch.tensor(0.5)
+    energies -= torch.mean(energies) # (nsamples, batch) - (1,), global ave prevents neg. corr. tail
+    tau = energies.new_tensor(0.5)   # ensures tau is on same device as energies
+
     for k in range(1, kmax + 1):
         rho_k = _autocorr_k(energies, k) # (nwalkers,)
         rho_k = torch.mean(rho_k)
@@ -88,8 +90,6 @@ def _autocorr_k(
     Returns:
         rho_k: 
     """
-    #energies = energies - torch.mean(energies, dim=0) # (nsamples, batch) - (1, batch)
-    energies -= torch.mean(energies) # (nsamples, batch) - (1,), global ave prevents neg. corr. tail
     auto_cov_k = torch.mean(energies[k:, :] * energies[:-k, :], dim=0) 
     var = torch.var(energies, dim=0, unbiased=False) # /N (biased) instead of /(N-1)
     rho_k = auto_cov_k / var

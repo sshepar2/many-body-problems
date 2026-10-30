@@ -10,7 +10,7 @@ from .sr import sr_update
 #from .plotting import plot_density
 from .utils import print_section, print_epoch
 from .checkpoint import load_checkpoint, save_checkpoint, resolve_state_dict
-
+from .config import WaveFunctionConfig, VmcConfig
 
 def run_vmc(
     wf_cfg: WaveFunctionConfig,
@@ -115,8 +115,7 @@ def run_vmc(
             for p in wf.layers.parameters():
                 p.requires_grad = False
         if 'ci' in vmc_cfg.freeze:
-            for p in wf.det_coefficients.parameters():
-                p.requires_grad = False
+            wf.det_coefficients.requires_grad = False
         if 'jastrow' in vmc_cfg.freeze:
             for p in wf.jastrow_ee.parameters():
                 p.requires_grad = False
@@ -503,7 +502,7 @@ def run_vmc(
     print_section("Start", "Final Energy Sampling")
     pos = thermalize(pos, wf, atoms, n_therm=vmc_cfg.n_therm, step_size=vmc_cfg.met_step)
     max_blocks = int(nblocks*vmc_cfg.block_ramp**vmc_cfg.epochs)
-    ke_tensor, pe_tensor = estimate_energy_tensor(
+    ke_tensor, pe_tensor, _ = estimate_energy_tensor(
         pos,
         wf,
         atoms,
